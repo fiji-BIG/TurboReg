@@ -156,6 +156,7 @@ private ImagePlus transformedImage = null;
  (3), and bilinear transformation (4).
  @see TurboReg_#run
  @see TurboReg_#getTargetPoints
+ @return Source points double array
  ********************************************************************/
 public double[][] getSourcePoints (
 ) {
@@ -183,6 +184,7 @@ public double[][] getSourcePoints (
  (3), and bilinear transformation (4).
  @see TurboReg_#run
  @see TurboReg_#getSourcePoints
+ @return Target Points double array
 ********************************************************************/
 public double[][] getTargetPoints (
 ) {
@@ -197,6 +199,7 @@ public double[][] getTargetPoints (
  <code>outputWidth</code> and <code>outputHeight</code> parameters of
  the call to the <code>run</code> method of <code>TurboReg_</code>.
  @see TurboReg_#run
+ @return ImagePlus of the transformed image
  ********************************************************************/
 public ImagePlus getTransformedImage (
 ) {
@@ -259,7 +262,7 @@ public ImagePlus getTransformedImage (
  <td></td><td>targetPoints[0][1]</td><td>17</td><td>floating-point (TRSAB)</td>
  </tr><tr>
  <td></td><td>sourcePoints[1][0]</td><td>18</td><td>floating-point (RSAB)</td>
- </tr><tr>
+ </tr><tr>clear
  <td></td><td>sourcePoints[1][1]</td><td>19</td><td>floating-point (RSAB)</td>
  </tr><tr>
  <td></td><td>targetPoints[1][0]</td><td>20</td><td>floating-point (RSAB)</td>
@@ -991,8 +994,12 @@ private ImagePlus alignImages (
 	}
 	sourcePoints = sourcePh.getPoints();
 	targetPoints = targetPh.getPoints();
-	final ResultsTable table = Analyzer.getResultsTable();
-	table.reset();
+//	final ResultsTable table = Analyzer.getResultsTable();
+	//Create a new table rather than using the main results table so macros can use the results table without
+	// being cleared
+	final ResultsTable table = new ResultsTable();
+//	 do not to reset a new table
+//	table.reset
 	switch (transformation) {
 		case turboRegDialog.TRANSLATION: {
 			table.incrementCounter();
@@ -1053,6 +1060,9 @@ private ImagePlus alignImages (
 	if (interactive) {
 		table.show("Refined Landmarks");
 	}
+
+	//reset the table so the headings on new tables aren't modified
+	table.reset();
 	source.killRoi();
 	target.killRoi();
 	return(transformImage(source, target.getWidth(), target.getHeight(),
