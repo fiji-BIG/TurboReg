@@ -156,6 +156,7 @@ private ImagePlus transformedImage = null;
  (3), and bilinear transformation (4).
  @see TurboReg_#run
  @see TurboReg_#getTargetPoints
+ @return Source points double array
  ********************************************************************/
 public double[][] getSourcePoints (
 ) {
