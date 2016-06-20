@@ -20,6 +20,29 @@
 	<url>http://fiji.sc/TurboReg</url>
 	<inceptionYear>2010</inceptionYear>
 
+	<!--
+	Added build section to avoid javadoc errors with maven
+	-->
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 	<licenses>
 		<license>
 			<name>BIG</name>
