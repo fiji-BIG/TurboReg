@@ -262,7 +262,7 @@ public ImagePlus getTransformedImage (
  <td></td><td>targetPoints[0][1]</td><td>17</td><td>floating-point (TRSAB)</td>
  </tr><tr>
  <td></td><td>sourcePoints[1][0]</td><td>18</td><td>floating-point (RSAB)</td>
- </tr><tr>
+ </tr><tr>clear
  <td></td><td>sourcePoints[1][1]</td><td>19</td><td>floating-point (RSAB)</td>
  </tr><tr>
  <td></td><td>targetPoints[1][0]</td><td>20</td><td>floating-point (RSAB)</td>
