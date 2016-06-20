@@ -184,6 +184,7 @@ public double[][] getSourcePoints (
  (3), and bilinear transformation (4).
  @see TurboReg_#run
  @see TurboReg_#getSourcePoints
+ @return Target Points double array
 ********************************************************************/
 public double[][] getTargetPoints (
 ) {
