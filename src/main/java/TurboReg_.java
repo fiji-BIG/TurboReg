@@ -994,8 +994,12 @@ private ImagePlus alignImages (
 	}
 	sourcePoints = sourcePh.getPoints();
 	targetPoints = targetPh.getPoints();
-	final ResultsTable table = Analyzer.getResultsTable();
-	table.reset();
+//	final ResultsTable table = Analyzer.getResultsTable();
+	//Create a new table rather than using the main results table so macros can use the results table without
+	// being cleared
+	final ResultsTable table = new ResultsTable();
+//	 do not to reset a new table
+//	table.reset
 	switch (transformation) {
 		case turboRegDialog.TRANSLATION: {
 			table.incrementCounter();
@@ -1056,6 +1060,9 @@ private ImagePlus alignImages (
 	if (interactive) {
 		table.show("Refined Landmarks");
 	}
+
+	//reset the table so the headings on new tables aren't modified
+	table.reset();
 	source.killRoi();
 	target.killRoi();
 	return(transformImage(source, target.getWidth(), target.getHeight(),
