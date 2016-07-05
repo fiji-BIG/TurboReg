@@ -1,10 +1,10 @@
 /*====================================================================	
-| Version: June 19, 2008
+| Version: July 7, 2011
 \===================================================================*/
 
 /*====================================================================
 | Philippe Thevenaz
-| EPFL/STI/IOA/LIB
+| EPFL/STI/IMT/LIB/BM.4.137
 | Station 17
 | CH-1015 Lausanne VD
 | Switzerland
@@ -49,7 +49,7 @@ import ij.WindowManager;
 import ij.gui.GUI;
 import ij.gui.ImageCanvas;
 import ij.gui.ImageWindow;
-import ij.gui.Roi;
+import ij.gui.PolygonRoi;
 import ij.gui.StackWindow;
 import ij.gui.Toolbar;
 import ij.measure.Calibration;
@@ -81,6 +81,7 @@ import java.awt.Insets;
 import java.awt.Label;
 import java.awt.Panel;
 import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.Scrollbar;
 import java.awt.TextArea;
 import java.awt.event.ActionEvent;
@@ -119,12 +120,11 @@ public class TurboReg_
 	implements
 		PlugIn
 
-{ /* begin class TurboReg_ */
+{ /* class TurboReg_ */
 
 /*....................................................................
-	Private variables
+	private variables
 ....................................................................*/
-
 private double[][] sourcePoints =
 	new double[turboRegPointHandler.NUM_POINTS][2];
 private double[][] targetPoints =
@@ -132,77 +132,8 @@ private double[][] targetPoints =
 private ImagePlus transformedImage = null;
 
 /*....................................................................
-	Public methods
+	PlugIn methods
 ....................................................................*/
-
-/*********************************************************************
- Accessor method for the <code>(double[][])sourcePoints</code> variable.
- This variable is valid only after a call to <code>run</code> with the
- option <code>-align</code> has been issued. What is returned is a
- two-dimensional array of type <code>double[][]</code> that contains
- coordinates from the image <code>sourceFilename</code>. These coordinates
- are given relative to the original image, before that the cropping
- described by the <code>sourceCropLeft</code>, <code>sourceCropTop</code>,
- <code>sourceCropRight</code>, and <code>sourceCropBottom</code> has been
- applied. These coordinates match those available from
- <code>targetPoints</code>. The total number of coordinates, equal to
- <code>sourcePoints[*].length</code>, is given by the constant
- <code>turboRegPointHandler.NUM_POINTS</code> which corresponds to four
- coordinates in the present version. The second index gives the horizontal
- component for <code>[0]</code> and the vertical component for
- <code>[1]</code>. The number of <i>useful</i> coordinates depends on the
- specific transformation for which the alignment has been performed:
- translation (1), scaled rotation (2), rotation (3), affine transformation
- (3), and bilinear transformation (4).
- @see TurboReg_#run
- @see TurboReg_#getTargetPoints
- ********************************************************************/
-public double[][] getSourcePoints (
-) {
-	return(sourcePoints);
-} /* end getSourcePoints */
-
-/*********************************************************************
- Accessor method for the <code>(double[][])targetPoints</code> variable.
- This variable is valid only after a call to <code>run</code> with the
- option <code>-align</code> has been issued. What is returned is a
- two-dimensional array of type <code>double[][]</code> that contains
- coordinates from the image <code>targetFilename</code>. These coordinates
- are given relative to the original image, before that the cropping
- described by the <code>targetCropLeft</code>, <code>targetCropTop</code>,
- <code>targetCropRight</code>, and <code>targetCropBottom</code> has been
- applied. These coordinates match those available from
- <code>sourcePoints</code>. The total number of coordinates, equal to
- <code>targetPoints[*].length</code>, is given by the constant
- <code>turboRegPointHandler.NUM_POINTS</code> which corresponds to four
- coordinates in the present version. The second index gives the horizontal
- component for <code>[0]</code> and the vertical component for
- <code>[1]</code>. The number of <i>useful</i> coordinates depends on the
- specific transformation for which the alignment has been performed:
- translation (1), scaled rotation (2), rotation (3), affine transformation
- (3), and bilinear transformation (4).
- @see TurboReg_#run
- @see TurboReg_#getSourcePoints
-********************************************************************/
-public double[][] getTargetPoints (
-) {
-	return(targetPoints);
-} /* end getTargetPoints */
-
-/*********************************************************************
- Accessor method for the <code>(ImagePlus)transformedImage</code>
- variable. This variable is valid only after a call to <code>run</code>
- with the option <code>-transform</code> has been issued. What is returned
- is an <code>ImagePlus</code> object of the size described by the
- <code>outputWidth</code> and <code>outputHeight</code> parameters of
- the call to the <code>run</code> method of <code>TurboReg_</code>.
- @see TurboReg_#run
- ********************************************************************/
-public ImagePlus getTransformedImage (
-) {
-	return(transformedImage);
-} /* end getTransformedImage */
-
 /*********************************************************************
  This method is the only one called by ImageJ. It checks that there
  are at least two grayscale images to register. If the command line
@@ -856,9 +787,79 @@ public void run (
 } /* end run */
 
 /*....................................................................
-	Private methods
+	public methods
 ....................................................................*/
+/*********************************************************************
+ Accessor method for the <code>(double[][])sourcePoints</code> variable.
+ This variable is valid only after a call to <code>run</code> with the
+ option <code>-align</code> has been issued. What is returned is a
+ two-dimensional array of type <code>double[][]</code> that contains
+ coordinates from the image <code>sourceFilename</code>. These coordinates
+ are given relative to the original image, before that the cropping
+ described by the <code>sourceCropLeft</code>, <code>sourceCropTop</code>,
+ <code>sourceCropRight</code>, and <code>sourceCropBottom</code> has been
+ applied. These coordinates match those available from
+ <code>targetPoints</code>. The total number of coordinates, equal to
+ <code>sourcePoints[*].length</code>, is given by the constant
+ <code>turboRegPointHandler.NUM_POINTS</code> which corresponds to four
+ coordinates in the present version. The second index gives the horizontal
+ component for <code>[0]</code> and the vertical component for
+ <code>[1]</code>. The number of <i>useful</i> coordinates depends on the
+ specific transformation for which the alignment has been performed:
+ translation (1), scaled rotation (2), rotation (3), affine transformation
+ (3), and bilinear transformation (4).
+ @see TurboReg_#run
+ @see TurboReg_#getTargetPoints
+ ********************************************************************/
+public double[][] getSourcePoints (
+) {
+	return(sourcePoints);
+} /* end getSourcePoints */
 
+/*********************************************************************
+ Accessor method for the <code>(double[][])targetPoints</code> variable.
+ This variable is valid only after a call to <code>run</code> with the
+ option <code>-align</code> has been issued. What is returned is a
+ two-dimensional array of type <code>double[][]</code> that contains
+ coordinates from the image <code>targetFilename</code>. These coordinates
+ are given relative to the original image, before that the cropping
+ described by the <code>targetCropLeft</code>, <code>targetCropTop</code>,
+ <code>targetCropRight</code>, and <code>targetCropBottom</code> has been
+ applied. These coordinates match those available from
+ <code>sourcePoints</code>. The total number of coordinates, equal to
+ <code>targetPoints[*].length</code>, is given by the constant
+ <code>turboRegPointHandler.NUM_POINTS</code> which corresponds to four
+ coordinates in the present version. The second index gives the horizontal
+ component for <code>[0]</code> and the vertical component for
+ <code>[1]</code>. The number of <i>useful</i> coordinates depends on the
+ specific transformation for which the alignment has been performed:
+ translation (1), scaled rotation (2), rotation (3), affine transformation
+ (3), and bilinear transformation (4).
+ @see TurboReg_#run
+ @see TurboReg_#getSourcePoints
+********************************************************************/
+public double[][] getTargetPoints (
+) {
+	return(targetPoints);
+} /* end getTargetPoints */
+
+/*********************************************************************
+ Accessor method for the <code>(ImagePlus)transformedImage</code>
+ variable. This variable is valid only after a call to <code>run</code>
+ with the option <code>-transform</code> has been issued. What is returned
+ is an <code>ImagePlus</code> object of the size described by the
+ <code>outputWidth</code> and <code>outputHeight</code> parameters of
+ the call to the <code>run</code> method of <code>TurboReg_</code>.
+ @see TurboReg_#run
+ ********************************************************************/
+public ImagePlus getTransformedImage (
+) {
+	return(transformedImage);
+} /* end getTransformedImage */
+
+/*....................................................................
+	private methods
+....................................................................*/
 /*------------------------------------------------------------------*/
 private ImagePlus alignImages (
 	final ImagePlus source,
@@ -868,17 +869,17 @@ private ImagePlus alignImages (
 	final int transformation,
 	final boolean interactive
 ) {
-	if ((source.getType() != source.GRAY16)
-		&& (source.getType() != source.GRAY32)
-		&& ((source.getType() != source.GRAY8)
+	if ((source.getType() != ImagePlus.GRAY16)
+		&& (source.getType() != ImagePlus.GRAY32)
+		&& ((source.getType() != ImagePlus.GRAY8)
 		|| source.getStack().isRGB() || source.getStack().isHSB())) {
 		IJ.error(
 			source.getTitle() + " should be grayscale (8, 16, or 32 bit)");
 		return(null);
 	}
-	if ((target.getType() != target.GRAY16)
-		&& (target.getType() != target.GRAY32)
-		&& ((target.getType() != target.GRAY8)
+	if ((target.getType() != ImagePlus.GRAY16)
+		&& (target.getType() != ImagePlus.GRAY32)
+		&& ((target.getType() != ImagePlus.GRAY8)
 		|| target.getStack().isRGB() || target.getStack().isHSB())) {
 		IJ.error(
 			target.getTitle() + " should be grayscale (8, 16, or 32 bit)");
@@ -964,10 +965,12 @@ private ImagePlus alignImages (
 			break;
 		}
 	}
-	final turboRegPointHandler sourcePh = new turboRegPointHandler(
-		sourceImp, transformation);
-	final turboRegPointHandler targetPh = new turboRegPointHandler(
-		targetImp, transformation);
+	final turboRegPointHandler sourcePh = (null == sourceImp.getWindow())
+		? (new turboRegPointHandler(transformation, sourceImp))
+		: (new turboRegPointHandler(sourceImp, transformation));
+	final turboRegPointHandler targetPh = (null == sourceImp.getWindow())
+		? (new turboRegPointHandler(transformation, targetImp))
+		: (new turboRegPointHandler(targetImp, transformation));
 	sourcePh.setPoints(sourcePoints);
 	targetPh.setPoints(targetPoints);
 	try {
@@ -1051,7 +1054,7 @@ private ImagePlus alignImages (
 		}
 	}
 	if (interactive) {
-		table.show("Refined Landmarks");
+		table.show("Results");
 	}
 	source.killRoi();
 	target.killRoi();
@@ -1066,9 +1069,10 @@ private ImagePlus[] createAdmissibleImageList (
 	final Stack<ImagePlus> stack = new Stack<ImagePlus>();
 	for (int k = 0; ((windowList != null) && (k < windowList.length)); k++) {
 		final ImagePlus imp = WindowManager.getImage(windowList[k]);
-		if ((imp != null) && ((imp.getType() == imp.GRAY16)
-			|| (imp.getType() == imp.GRAY32)
-			|| ((imp.getType() == imp.GRAY8) && !imp.getStack().isHSB()))) {
+		if ((imp != null) && ((imp.getType() == ImagePlus.GRAY16)
+			|| (imp.getType() == ImagePlus.GRAY32)
+			|| ((imp.getType() == ImagePlus.GRAY8)
+			&& !imp.getStack().isHSB()))) {
 			stack.push(imp);
 		}
 	}
@@ -1084,58 +1088,58 @@ private ImagePlus[] createAdmissibleImageList (
 private void dumpSyntax (
 	final String options
 ) {
-	IJ.write(options);
-	IJ.write("");
-	IJ.write("___");
-	IJ.write("");
-	IJ.write("ARGUMENTS: { -help | -align | -transform }");
-	IJ.write("");
-	IJ.write("-help SHOWS THIS MESSAGE");
-	IJ.write("");
-	IJ.write("-align");
-	IJ.write("{ -file | -window }");
-	IJ.write("  sourceFilename STRING WITH OPTIONAL QUOTES");
-	IJ.write("  sourceWindowTitle STRING WITH OPTIONAL QUOTES");
-	IJ.write("sourceCropLeft INTEGER");
-	IJ.write("sourceCropTop INTEGER");
-	IJ.write("sourceCropRight INTEGER");
-	IJ.write("sourceCropBottom INTEGER");
-	IJ.write("{ -file | -window }");
-	IJ.write("  targetFilename STRING WITH OPTIONAL QUOTES");
-	IJ.write("  targetWindowTitle STRING WITH OPTIONAL QUOTES");
-	IJ.write("targetCropLeft INTEGER");
-	IJ.write("targetCropTop INTEGER");
-	IJ.write("targetCropRight INTEGER");
-	IJ.write("targetCropBottom INTEGER");
-	IJ.write(
+	IJ.log(options);
+	IJ.log("");
+	IJ.log("___");
+	IJ.log("");
+	IJ.log("ARGUMENTS: { -help | -align | -transform }");
+	IJ.log("");
+	IJ.log("-help SHOWS THIS MESSAGE");
+	IJ.log("");
+	IJ.log("-align");
+	IJ.log("{ -file | -window }");
+	IJ.log("  sourceFilename STRING WITH OPTIONAL QUOTES");
+	IJ.log("  sourceWindowTitle STRING WITH OPTIONAL QUOTES");
+	IJ.log("sourceCropLeft INTEGER");
+	IJ.log("sourceCropTop INTEGER");
+	IJ.log("sourceCropRight INTEGER");
+	IJ.log("sourceCropBottom INTEGER");
+	IJ.log("{ -file | -window }");
+	IJ.log("  targetFilename STRING WITH OPTIONAL QUOTES");
+	IJ.log("  targetWindowTitle STRING WITH OPTIONAL QUOTES");
+	IJ.log("targetCropLeft INTEGER");
+	IJ.log("targetCropTop INTEGER");
+	IJ.log("targetCropRight INTEGER");
+	IJ.log("targetCropBottom INTEGER");
+	IJ.log(
 		"{ -translation | -rigidBody | -scaledRotation | -affine | -bilinear }");
-	IJ.write("sourcePointsX[<*>] FLOATING-POINT");
-	IJ.write("sourcePointsY[<*>] FLOATING-POINT");
-	IJ.write("targetPointsX[<*>] FLOATING-POINT");
-	IJ.write("targetPointsY[<*>] FLOATING-POINT");
-	IJ.write("{ -hideOutput | -showOutput }");
-	IJ.write("");
-	IJ.write("-transform");
-	IJ.write("{ -file | -window }");
-	IJ.write("  sourceFilename STRING WITH OPTIONAL QUOTES");
-	IJ.write("  sourceWindowTitle STRING WITH OPTIONAL QUOTES");
-	IJ.write("outputWidth INTEGER");
-	IJ.write("outputHeight INTEGER");
-	IJ.write(
+	IJ.log("sourcePointsX[<*>] FLOATING-POINT");
+	IJ.log("sourcePointsY[<*>] FLOATING-POINT");
+	IJ.log("targetPointsX[<*>] FLOATING-POINT");
+	IJ.log("targetPointsY[<*>] FLOATING-POINT");
+	IJ.log("{ -hideOutput | -showOutput }");
+	IJ.log("");
+	IJ.log("-transform");
+	IJ.log("{ -file | -window }");
+	IJ.log("  sourceFilename STRING WITH OPTIONAL QUOTES");
+	IJ.log("  sourceWindowTitle STRING WITH OPTIONAL QUOTES");
+	IJ.log("outputWidth INTEGER");
+	IJ.log("outputHeight INTEGER");
+	IJ.log(
 		"{ -translation | -rigidBody | -scaledRotation | -affine | -bilinear }");
-	IJ.write("sourcePointsX[<*>] FLOATING-POINT");
-	IJ.write("sourcePointsY[<*>] FLOATING-POINT");
-	IJ.write("targetPointsX[<*>] FLOATING-POINT");
-	IJ.write("targetPointsY[<*>] FLOATING-POINT");
-	IJ.write("{ -hideOutput | -showOutput }");
-	IJ.write("");
-	IJ.write("<*> FOR TRANSLATION: 1 BLOCK OF FOUR COORDINATES");
-	IJ.write("<*> FOR RIGID-BODY: 3 BLOCKS OF FOUR COORDINATES");
-	IJ.write("<*> FOR SCALED-ROTATION: 2 BLOCKS OF FOUR COORDINATES");
-	IJ.write("<*> FOR AFFINE: 3 BLOCKS OF FOUR COORDINATES");
-	IJ.write("<*> FOR BILINEAR: 4 BLOCKS OF FOUR COORDINATES");
-	IJ.write("");
-	IJ.write("~~~");
+	IJ.log("sourcePointsX[<*>] FLOATING-POINT");
+	IJ.log("sourcePointsY[<*>] FLOATING-POINT");
+	IJ.log("targetPointsX[<*>] FLOATING-POINT");
+	IJ.log("targetPointsY[<*>] FLOATING-POINT");
+	IJ.log("{ -hideOutput | -showOutput }");
+	IJ.log("");
+	IJ.log("<*> FOR TRANSLATION: 1 BLOCK OF FOUR COORDINATES");
+	IJ.log("<*> FOR RIGID-BODY: 3 BLOCKS OF FOUR COORDINATES");
+	IJ.log("<*> FOR SCALED-ROTATION: 2 BLOCKS OF FOUR COORDINATES");
+	IJ.log("<*> FOR AFFINE: 3 BLOCKS OF FOUR COORDINATES");
+	IJ.log("<*> FOR BILINEAR: 4 BLOCKS OF FOUR COORDINATES");
+	IJ.log("");
+	IJ.log("~~~");
 } /* end dumpSyntax */
 
 /*------------------------------------------------------------------*/
@@ -1194,7 +1198,7 @@ private String[] getTokens (
 	st.quoteChar('\"');
 	final Vector<String> v = new Vector<String>();
 	try {
-		while (st.nextToken() != st.TT_EOF) {
+		while (st.nextToken() != StreamTokenizer.TT_EOF) {
 			v.add(new String(st.sval));
 		}
 	} catch (IOException e) {
@@ -1238,9 +1242,9 @@ private ImagePlus transformImage (
 	final int transformation,
 	final boolean interactive
 ) {
-	if ((source.getType() != source.GRAY16)
-		&& (source.getType() != source.GRAY32)
-		&& ((source.getType() != source.GRAY8)
+	if ((source.getType() != ImagePlus.GRAY16)
+		&& (source.getType() != ImagePlus.GRAY32)
+		&& ((source.getType() != ImagePlus.GRAY8)
 		|| source.getStack().isRGB() || source.getStack().isHSB())) {
 		IJ.error(
 			source.getTitle() + " should be grayscale (8, 16, or 32 bit)");
@@ -1295,12 +1299,16 @@ class turboRegCredits
 	extends
 		Dialog
 
-{ /* begin class turboRegCredits */
+{ /* class turboRegCredits */
 
 /*....................................................................
-	Public methods
+	private variables
 ....................................................................*/
+private static final long serialVersionUID = 1L;
 
+/*....................................................................
+	Container methods
+....................................................................*/
 /*********************************************************************
  Return some additional margin to the dialog, for aesthetic purposes.
  Necessary for the current MacOS X Java version, lest the first item
@@ -1311,6 +1319,9 @@ public Insets getInsets (
 	return(new Insets(0, 20, 20, 20));
 } /* end getInsets */
 
+/*....................................................................
+	constructors
+....................................................................*/
 /*********************************************************************
  This constructor prepares the dialog box.
  @param parentWindow Parent window.
@@ -1342,7 +1353,7 @@ public turboRegCredits (
 	text.append(
 		" \n");
 	text.append(
-		" This TurboReg version is dated June 19, 2008\n");
+		" This TurboReg version is dated July 7, 2011\n");
 	text.append(
 		" \n");
 	text.append(
@@ -1410,12 +1421,11 @@ class turboRegDialog
 	implements
 		ActionListener
 
-{ /* begin class turboRegDialog */
+{ /* class turboRegDialog */
 
 /*....................................................................
-	Public variables
+	public variables
 ....................................................................*/
-
 /*********************************************************************
  Three points generate an affine transformation, which is any
  combination of translation, rotation, isotropic scaling, anisotropic
@@ -1485,21 +1495,25 @@ public static final int SCALED_ROTATION = 4;
 public static final int TRANSLATION = 2;
 
 /*....................................................................
-	Private variables
+	private variables
 ....................................................................*/
-
 /*********************************************************************
  Admissible values are {<code>TRANSLATION</code>, <code>RIGID_BODY</code>,
  <code>SCALED_ROTATION</code>, <code>AFFINE</code>, <code>BILINEAR<code>}.
  ********************************************************************/
+private ImagePlus[] admissibleImageList;
+private ImageCanvas sourceIc;
+private ImageCanvas targetIc;
+private ImagePlus sourceImp;
+private ImagePlus targetImp;
+private	Scrollbar sourceScrollbar;
+private	Scrollbar targetScrollbar;
+private static boolean saveOnExit = false;
+private static boolean accelerated = true;
+private static final long serialVersionUID = 1L;
 private static int transformation = RIGID_BODY;
 private static int sourceColorPlane = BLACK;
 private static int targetColorPlane = BLACK;
-private static boolean saveOnExit = false;
-private static boolean accelerated = true;
-private final turboRegFinalAction finalAction = new turboRegFinalAction(this);
-private final turboRegPointToolbar tb = new turboRegPointToolbar(
-	Toolbar.getInstance());
 private final Button automaticButton = new Button("Automatic");
 private final Button batchButton = new Button("Batch");
 private final CheckboxGroup sourceKrgbGroup = new CheckboxGroup();
@@ -1531,13 +1545,12 @@ private final Checkbox affine = new Checkbox(
 	"Affine", transformationGroup, transformation == AFFINE);
 private final Checkbox bilinear = new Checkbox(
 	"Bilinear", transformationGroup, transformation == BILINEAR);
-private ImagePlus[] admissibleImageList;
-private ImageCanvas sourceIc;
-private ImageCanvas targetIc;
-private ImagePlus sourceImp;
-private ImagePlus targetImp;
-private	Scrollbar sourceScrollbar;
-private	Scrollbar targetScrollbar;
+private final turboRegFinalAction finalAction = new turboRegFinalAction(this);
+private final turboRegPointToolbar tb = new turboRegPointToolbar(
+	Toolbar.getInstance());
+private int sourceChoiceIndex = 0;
+private int targetChoiceIndex = 1;
+private int pyramidDepth;
 private turboRegImage sourceImg;
 private turboRegImage targetImg;
 private turboRegMask sourceMsk;
@@ -1546,14 +1559,10 @@ private turboRegPointAction sourcePa;
 private turboRegPointAction targetPa;
 private turboRegPointHandler sourcePh;
 private turboRegPointHandler targetPh;
-private int sourceChoiceIndex = 0;
-private int targetChoiceIndex = 1;
-private int pyramidDepth;
 
 /*....................................................................
-	Public methods
+	ActionListener methods
 ....................................................................*/
-
 /*********************************************************************
  This method processes the button actions.
  @param ae The expected actions are as follows:
@@ -1631,6 +1640,9 @@ public void actionPerformed (
 	}
 } /* end actionPerformed */
 
+/*....................................................................
+	Container methods
+....................................................................*/
 /*********************************************************************
  Return some additional margin to the dialog, for aesthetic purposes.
  Necessary for the current MacOS X Java version, lest the first item
@@ -1641,46 +1653,9 @@ public Insets getInsets (
 	return(new Insets(0, 20, 20, 20));
 } /* end getInsets */
 
-/*********************************************************************
- Wait until the threads that compute spline coefficients, image and
- mask pyramids are done.
- ********************************************************************/
-public void joinThreads (
-) {
-	try {
-		sourceImg.getThread().join();
-		sourceMsk.getThread().join();
-		targetImg.getThread().join();
-		targetMsk.getThread().join();
-	} catch (InterruptedException e) {
-		IJ.log(
-			"Unexpected interruption exception " + e.getMessage());
-	}
-} /* end joinThreads */
-
-/*********************************************************************
- Restore the regular listener interfaces, restore the regular ImageJ
- toolbar, stop the progress bar, and ask for garbage collection.
- @see turboRegDialog#cancelImages()
- ********************************************************************/
-public void restoreAll (
-) {
-	cancelImages();
-	tb.restorePreviousToolbar();
-	Toolbar.getInstance().repaint();
-	turboRegProgressBar.resetProgressBar();
-	Runtime.getRuntime().gc();
-} /* end restoreAll */
-
-/*********************************************************************
- Interrupt the two preprocessing threads.
- ********************************************************************/
-public void stopThreads (
-) {
-	stopSourceThreads();
-	stopTargetThreads();
-} /* end stopThreads */
-
+/*....................................................................
+	constructors
+....................................................................*/
 /*********************************************************************
  This constructor prepares the dialog box and starts the first
  computational threads. The threads will need to be killed and
@@ -2111,9 +2086,51 @@ public turboRegDialog (
 } /* end turboRegDialog */
 
 /*....................................................................
-	Private methods
+	public methods
 ....................................................................*/
+/*********************************************************************
+ Wait until the threads that compute spline coefficients, image and
+ mask pyramids are done.
+ ********************************************************************/
+public void joinThreads (
+) {
+	try {
+		sourceImg.getThread().join();
+		sourceMsk.getThread().join();
+		targetImg.getThread().join();
+		targetMsk.getThread().join();
+	} catch (InterruptedException e) {
+		IJ.log(
+			"Unexpected interruption exception " + e.getMessage());
+	}
+} /* end joinThreads */
 
+/*********************************************************************
+ Restore the regular listener interfaces, restore the regular ImageJ
+ toolbar, stop the progress bar, and ask for garbage collection.
+ @see turboRegDialog#cancelImages()
+ ********************************************************************/
+public void restoreAll (
+) {
+	cancelImages();
+	tb.restorePreviousToolbar();
+	Toolbar.getInstance().repaint();
+	turboRegProgressBar.resetProgressBar();
+	Runtime.getRuntime().gc();
+} /* end restoreAll */
+
+/*********************************************************************
+ Interrupt the two preprocessing threads.
+ ********************************************************************/
+public void stopThreads (
+) {
+	stopSourceThreads();
+	stopTargetThreads();
+} /* end stopThreads */
+
+/*....................................................................
+	private methods
+....................................................................*/
 /*------------------------------------------------------------------*/
 private void cancelImages (
 ) {
@@ -2426,7 +2443,7 @@ private boolean loadLandmarks (
 		int k = 1;
 		if (!(line = br.readLine()).equals("Transformation")) {
 			fr.close();
-			IJ.write("Line " + k + ": 'Transformation'");
+			IJ.log("Line " + k + ": 'Transformation'");
 			return(false);
 		}
 		++k;
@@ -2448,7 +2465,7 @@ private boolean loadLandmarks (
 		}
 		else {
 			fr.close();
-			IJ.write("Line " + k 
+			IJ.log("Line " + k 
 				+ ": 'TRANSLATION' "
 				+ "| 'RIGID_BODY' "
 				+ "| 'SCALED_ROTATION' "
@@ -2459,26 +2476,26 @@ private boolean loadLandmarks (
 		++k;
 		if (!(line = br.readLine()).equals("")) {
 			fr.close();
-			IJ.write("Line " + k + ": ''");
+			IJ.log("Line " + k + ": ''");
 			return(false);
 		}
 		++k;
 		if (!(line = br.readLine()).equals("Source size")) {
 			fr.close();
-			IJ.write("Line " + k + ": 'Source size'");
+			IJ.log("Line " + k + ": 'Source size'");
 			return(false);
 		}
 		++k;
 		if ((line = br.readLine()) == null) {
 			fr.close();
-			IJ.write("Line " + k + ": #sourceWidth# <tab> #sourceHeight#");
+			IJ.log("Line " + k + ": #sourceWidth# <tab> #sourceHeight#");
 			return(false);
 		}
 		line = line.trim();
 		separatorIndex = line.indexOf('\t');
 		if (separatorIndex == -1) {
 			fr.close();
-			IJ.write("Line " + k + ": #sourceWidth# <tab> #sourceHeight#");
+			IJ.log("Line " + k + ": #sourceWidth# <tab> #sourceHeight#");
 			return(false);
 		}
 		xString = line.substring(0, separatorIndex);
@@ -2487,39 +2504,39 @@ private boolean loadLandmarks (
 		yString = yString.trim();
 		if (Integer.parseInt(xString) != sourceImp.getWidth()) {
 			fr.close();
-			IJ.write("Line " + k + ": The source width"
+			IJ.log("Line " + k + ": The source width"
 				+ " should not differ from that in the landmarks file");
 			return(false);
 		}
 		if (Integer.parseInt(yString) != sourceImp.getHeight()) {
 			fr.close();
-			IJ.write("Line " + k + ": The source height"
+			IJ.log("Line " + k + ": The source height"
 				+ " should not differ from that in the landmarks file");
 			return(false);
 		}
 		++k;
 		if (!(line = br.readLine()).equals("")) {
 			fr.close();
-			IJ.write("Line " + k + ": ''");
+			IJ.log("Line " + k + ": ''");
 			return(false);
 		}
 		++k;
 		if (!(line = br.readLine()).equals("Target size")) {
 			fr.close();
-			IJ.write("Line " + k + ": 'Target size'");
+			IJ.log("Line " + k + ": 'Target size'");
 			return(false);
 		}
 		++k;
 		if ((line = br.readLine()) == null) {
 			fr.close();
-			IJ.write("Line " + k + ": #targetWidth# <tab> #targetHeight#");
+			IJ.log("Line " + k + ": #targetWidth# <tab> #targetHeight#");
 			return(false);
 		}
 		line = line.trim();
 		separatorIndex = line.indexOf('\t');
 		if (separatorIndex == -1) {
 			fr.close();
-			IJ.write("Line " + k + ": #targetWidth# <tab> #targetHeight#");
+			IJ.log("Line " + k + ": #targetWidth# <tab> #targetHeight#");
 			return(false);
 		}
 		xString = line.substring(0, separatorIndex);
@@ -2528,26 +2545,26 @@ private boolean loadLandmarks (
 		yString = yString.trim();
 		if (Integer.parseInt(xString) != targetImp.getWidth()) {
 			fr.close();
-			IJ.write("Line " + k + ": The target width"
+			IJ.log("Line " + k + ": The target width"
 				+ " should not differ from that in the landmarks file");
 			return(false);
 		}
 		if (Integer.parseInt(yString) != targetImp.getHeight()) {
 			fr.close();
-			IJ.write("Line " + k + ": The target height"
+			IJ.log("Line " + k + ": The target height"
 				+ " should not differ from that in the landmarks file");
 			return(false);
 		}
 		++k;
 		if (!(line = br.readLine()).equals("")) {
 			fr.close();
-			IJ.write("Line " + k + ": ''");
+			IJ.log("Line " + k + ": ''");
 			return(false);
 		}
 		++k;
 		if (!(line = br.readLine()).equals("Refined source landmarks")) {
 			fr.close();
-			IJ.write("Line " + k + ": 'Refined source landmarks'");
+			IJ.log("Line " + k + ": 'Refined source landmarks'");
 			return(false);
 		}
 		if (transformation == RIGID_BODY) {
@@ -2555,7 +2572,7 @@ private boolean loadLandmarks (
 				++k;
 				if ((line = br.readLine()) == null) {
 					fr.close();
-					IJ.write("Line " + k
+					IJ.log("Line " + k
 						+ ": #xSourcePoint# <tab> #ySourcePoint#");
 					return(false);
 				}
@@ -2563,7 +2580,7 @@ private boolean loadLandmarks (
 				separatorIndex = line.indexOf('\t');
 				if (separatorIndex == -1) {
 					fr.close();
-					IJ.write("Line " + k
+					IJ.log("Line " + k
 						+ ": #xSourcePoint# <tab> #ySourcePoint#");
 					return(false);
 				}
@@ -2580,7 +2597,7 @@ private boolean loadLandmarks (
 				++k;
 				if ((line = br.readLine()) == null) {
 					fr.close();
-					IJ.write("Line " + k
+					IJ.log("Line " + k
 						+ ": #xSourcePoint# <tab> #ySourcePoint#");
 					return(false);
 				}
@@ -2588,7 +2605,7 @@ private boolean loadLandmarks (
 				separatorIndex = line.indexOf('\t');
 				if (separatorIndex == -1) {
 					fr.close();
-					IJ.write("Line " + k
+					IJ.log("Line " + k
 						+ ": #xSourcePoint# <tab> #ySourcePoint#");
 					return(false);
 				}
@@ -2603,13 +2620,13 @@ private boolean loadLandmarks (
 		++k;
 		if (!(line = br.readLine()).equals("")) {
 			fr.close();
-			IJ.write("Line " + k + ": ''");
+			IJ.log("Line " + k + ": ''");
 			return(false);
 		}
 		++k;
 		if (!(line = br.readLine()).equals("Target landmarks")) {
 			fr.close();
-			IJ.write("Line " + k + ": 'Target landmarks'");
+			IJ.log("Line " + k + ": 'Target landmarks'");
 			return(false);
 		}
 		if (transformation == RIGID_BODY) {
@@ -2617,7 +2634,7 @@ private boolean loadLandmarks (
 				++k;
 				if ((line = br.readLine()) == null) {
 					fr.close();
-					IJ.write("Line " + k
+					IJ.log("Line " + k
 						+ ": #xTargetPoint# <tab> #yTargetPoint#");
 					return(false);
 				}
@@ -2625,7 +2642,7 @@ private boolean loadLandmarks (
 				separatorIndex = line.indexOf('\t');
 				if (separatorIndex == -1) {
 					fr.close();
-					IJ.write("Line " + k
+					IJ.log("Line " + k
 						+ ": #xTargetPoint# <tab> #yTargetPoint#");
 					return(false);
 				}
@@ -2642,7 +2659,7 @@ private boolean loadLandmarks (
 				++k;
 				if ((line = br.readLine()) == null) {
 					fr.close();
-					IJ.write("Line " + k
+					IJ.log("Line " + k
 						+ ": #xTargetPoint# <tab> #yTargetPoint#");
 					return(false);
 				}
@@ -2650,7 +2667,7 @@ private boolean loadLandmarks (
 				separatorIndex = line.indexOf('\t');
 				if (separatorIndex == -1) {
 					fr.close();
-					IJ.write("Line " + k
+					IJ.log("Line " + k
 						+ ": #xTargetPoint# <tab> #yTargetPoint#");
 					return(false);
 				}
@@ -2676,13 +2693,14 @@ private boolean loadLandmarks (
 			"Number format exception " + e.getMessage());
 		return(false);
 	}
-	if (transformation != this.transformation) {
-		if ((transformation == BILINEAR) || (this.transformation == BILINEAR)) {
+	if (transformation != turboRegDialog.transformation) {
+		if ((transformation == BILINEAR)
+			|| (turboRegDialog.transformation == BILINEAR)) {
 			cancelImages();
 			createImages();
 			startThreads();
 		}
-		this.transformation = transformation;
+		turboRegDialog.transformation = transformation;
 		setTransformation();
 	}
 	sourcePh.setPoints(sourcePoint);
@@ -2847,6 +2865,7 @@ private void startThreads (
 } /* end startThreads */
 
 /*------------------------------------------------------------------*/
+@SuppressWarnings("static-access")
 private void stopSourceThreads (
 ) {
 	while (sourceImg.getThread().isAlive()) {
@@ -2860,6 +2879,7 @@ private void stopSourceThreads (
 } /* end stopSourceThreads */
 
 /*------------------------------------------------------------------*/
+@SuppressWarnings("static-access")
 private void stopTargetThreads (
 ) {
 	while (targetImg.getThread().isAlive()) {
@@ -2888,12 +2908,11 @@ class turboRegFinalAction
 	implements
 		Runnable
 
-{ /* begin class turboRegFinalAction */
+{ /* class turboRegFinalAction */
 
 /*....................................................................
-	Public variables
+	public variables
 ....................................................................*/
-
 /*********************************************************************
  Automatic registration: the initial source landmarks are
  refined to minimize the mean-square error.
@@ -2913,7 +2932,7 @@ public static final int MANUAL = 2;
 public static final int BATCH = 3;
 
 /*....................................................................
-	Private variables
+	private variables
 ....................................................................*/
 private Thread t;
 private turboRegDialog td;
@@ -2934,18 +2953,8 @@ private volatile boolean saveOnExit;
 private volatile boolean colorOutput;
 
 /*....................................................................
-	Public methods
+	Runnable methods
 ....................................................................*/
-
-/*********************************************************************
- Return the thread associated with this <code>turboRegFinalAction</code>
- object.
- ********************************************************************/
-public Thread getThread (
-) {
-	return(t);
-} /* end getThread */
-
 /*********************************************************************
  Start under the control of the main event loop, pause as long as
  the dialog event loop is active, and resume processing when
@@ -3020,7 +3029,7 @@ public void run (
 				final StackConverter scnv = new StackConverter(outputImp);
 				scnv.convertToGray8();
 				final ImageConverter icnv = new ImageConverter(outputImp);
-				icnv.setDoScaling(false);
+				ImageConverter.setDoScaling(false);
 				icnv.convertRGBStackToRGB();
 				if (td != null) {
 					outputImp.show();
@@ -3133,6 +3142,63 @@ public void run (
 	}
 } /* end run */
 
+/*....................................................................
+	constructors
+....................................................................*/
+/*********************************************************************
+ Start a thread under the control of the main event loop. This thread
+ has access to the progress bar, while methods called directly from
+ within <code>turboRegDialog</code> do not because they are under the
+ control of its own event loop.
+ @param dialog Gives access to some utility methods within
+ <code>turboRegDialog</code>.
+ ********************************************************************/
+public turboRegFinalAction (
+	final turboRegDialog dialog
+) {
+	td = dialog;
+	t = new Thread(this);
+} /* end turboRegFinalAction */
+
+/*********************************************************************
+ Start a thread under the control of the main event loop.
+ ********************************************************************/
+public turboRegFinalAction (
+	final turboRegImage sourceImg,
+	final turboRegMask sourceMsk,
+	final turboRegPointHandler sourcePh,
+	final turboRegImage targetImg,
+	final turboRegMask targetMsk,
+	final turboRegPointHandler targetPh,
+	final int transformation
+) {
+	this.sourceImg = sourceImg;
+	this.sourceMsk = sourceMsk;
+	this.sourcePh = sourcePh;
+	this.targetImg = targetImg;
+	this.targetMsk = targetMsk;
+	this.targetPh = targetPh;
+	this.transformation = transformation;
+	accelerated = false;
+	saveOnExit = false;
+	operation = AUTOMATIC;
+	colorOutput = false;
+	td = null;
+	t = new Thread(this);
+} /* end turboRegFinalAction */
+
+/*....................................................................
+	public methods
+....................................................................*/
+/*********************************************************************
+ Return the thread associated with this <code>turboRegFinalAction</code>
+ object.
+ ********************************************************************/
+public Thread getThread (
+) {
+	return(t);
+} /* end getThread */
+
 /*********************************************************************
  Pass parameter from <code>turboRegDialog</code> to
  <code>turboRegFinalAction</code>.
@@ -3226,48 +3292,6 @@ public void setup (
 	operation = BATCH;
 } /* end setup */
 
-/*********************************************************************
- Start a thread under the control of the main event loop. This thread
- has access to the progress bar, while methods called directly from
- within <code>turboRegDialog</code> do not because they are under the
- control of its own event loop.
- @param dialog Gives access to some utility methods within
- <code>turboRegDialog</code>.
- ********************************************************************/
-public turboRegFinalAction (
-	final turboRegDialog dialog
-) {
-	td = dialog;
-	t = new Thread(this);
-} /* end turboRegFinalAction */
-
-/*********************************************************************
- Start a thread under the control of the main event loop.
- ********************************************************************/
-public turboRegFinalAction (
-	final turboRegImage sourceImg,
-	final turboRegMask sourceMsk,
-	final turboRegPointHandler sourcePh,
-	final turboRegImage targetImg,
-	final turboRegMask targetMsk,
-	final turboRegPointHandler targetPh,
-	final int transformation
-) {
-	this.sourceImg = sourceImg;
-	this.sourceMsk = sourceMsk;
-	this.sourcePh = sourcePh;
-	this.targetImg = targetImg;
-	this.targetMsk = targetMsk;
-	this.targetPh = targetPh;
-	this.transformation = transformation;
-	accelerated = false;
-	saveOnExit = false;
-	operation = AUTOMATIC;
-	colorOutput = false;
-	td = null;
-	t = new Thread(this);
-} /* end turboRegFinalAction */
-
 } /* end class turboRegFinalAction */
 
 /*====================================================================
@@ -3284,10 +3308,10 @@ class turboRegImage
 	implements
 		Runnable
 
-{ /* begin class turboRegImage */
+{ /* class turboRegImage */
 
 /*....................................................................
-	Private variables
+	private variables
 ....................................................................*/
 private final Stack<Object> pyramid = new Stack<Object>();
 private Thread t;
@@ -3302,9 +3326,103 @@ private int transformation;
 private boolean isTarget;
 
 /*....................................................................
-	Public methods
+	Runnable methods
 ....................................................................*/
+/*********************************************************************
+ Start the image precomputations. The computation of the B-spline
+ coefficients of the full-size image is not interruptible; all other
+ methods are.
+ ********************************************************************/
+public void run (
+) {
+	coefficient = getBasicFromCardinal2D();
+	switch (transformation) {
+		case turboRegDialog.GENERIC_TRANSFORMATION: {
+			break;
+		}
+		case turboRegDialog.TRANSLATION:
+		case turboRegDialog.RIGID_BODY:
+		case turboRegDialog.SCALED_ROTATION:
+		case turboRegDialog.AFFINE: {
+			if (isTarget) {
+				buildCoefficientPyramid();
+			}
+			else {
+				imageToXYGradient2D();
+				buildImageAndGradientPyramid();
+			}
+			break;
+		}
+		case turboRegDialog.BILINEAR: {
+			if (isTarget) {
+				buildImagePyramid();
+			}
+			else {
+				buildCoefficientPyramid();
+			}
+			break;
+		}
+	}
+} /* end run */
 
+/*....................................................................
+	constructors
+....................................................................*/
+/*********************************************************************
+ Converts the pixel array of the incoming <code>ImagePlus</code>
+ object into a local <code>float</code> array.
+ @param imp <code>ImagePlus</code> object to preprocess.
+ @param transformation Transformation code.
+ @param isTarget Tags the current object as a target or source image.
+ ********************************************************************/
+public turboRegImage (
+	final ImagePlus imp,
+	final int transformation,
+	final boolean isTarget
+) {
+	t = new Thread(this);
+	t.setDaemon(true);
+	this.transformation = transformation;
+	this.isTarget = isTarget;
+	width = imp.getWidth();
+	height = imp.getHeight();
+	int k = 0;
+	turboRegProgressBar.addWorkload(height);
+	if (imp.getType() == ImagePlus.GRAY8) {
+		image = new float[width * height];
+		final byte[] pixels = (byte[])imp.getProcessor().getPixels();
+		for (int y = 0; (y < height); y++) {
+			for (int x = 0; (x < width); x++, k++) {
+				image[k] = (float)(pixels[k] & 0xFF);
+			}
+			turboRegProgressBar.stepProgressBar();
+		}
+	}
+	else if (imp.getType() == ImagePlus.GRAY16) {
+		image = new float[width * height];
+		final short[] pixels = (short[])imp.getProcessor().getPixels();
+		for (int y = 0; (y < height); y++) {
+			for (int x = 0; (x < width); x++, k++) {
+				if (pixels[k] < (short)0) {
+					image[k] = (float)pixels[k] + 65536.0F;
+				}
+				else {
+					image[k] = (float)pixels[k];
+				}
+			}
+			turboRegProgressBar.stepProgressBar();
+		}
+	}
+	else if (imp.getType() == ImagePlus.GRAY32) {
+		image = (float[])imp.getProcessor().getPixels();
+	}
+	turboRegProgressBar.workloadDone(height);
+} /* end turboRegImage */
+
+
+/*....................................................................
+	public methods
+....................................................................*/
 /*********************************************************************
  Return the B-spline coefficients of the full-size image.
  ********************************************************************/
@@ -3401,43 +3519,6 @@ public float[] getYGradient (
 } /* end getYGradient */
 
 /*********************************************************************
- Start the image precomputations. The computation of the B-spline
- coefficients of the full-size image is not interruptible; all other
- methods are.
- ********************************************************************/
-public void run (
-) {
-	coefficient = getBasicFromCardinal2D();
-	switch (transformation) {
-		case turboRegDialog.GENERIC_TRANSFORMATION: {
-			break;
-		}
-		case turboRegDialog.TRANSLATION:
-		case turboRegDialog.RIGID_BODY:
-		case turboRegDialog.SCALED_ROTATION:
-		case turboRegDialog.AFFINE: {
-			if (isTarget) {
-				buildCoefficientPyramid();
-			}
-			else {
-				imageToXYGradient2D();
-				buildImageAndGradientPyramid();
-			}
-			break;
-		}
-		case turboRegDialog.BILINEAR: {
-			if (isTarget) {
-				buildImagePyramid();
-			}
-			else {
-				buildCoefficientPyramid();
-			}
-			break;
-		}
-	}
-} /* end run */
-
-/*********************************************************************
  Sets the depth up to which the pyramids should be computed.
  @see turboRegImage#getImage()
  ********************************************************************/
@@ -3456,61 +3537,9 @@ public void setTransformation (
 	this.transformation = transformation;
 } /* end setTransformation */
 
-/*********************************************************************
- Converts the pixel array of the incoming <code>ImagePlus</code>
- object into a local <code>float</code> array.
- @param imp <code>ImagePlus</code> object to preprocess.
- @param transformation Transformation code.
- @param isTarget Tags the current object as a target or source image.
- ********************************************************************/
-public turboRegImage (
-	final ImagePlus imp,
-	final int transformation,
-	final boolean isTarget
-) {
-	t = new Thread(this);
-	t.setDaemon(true);
-	this.transformation = transformation;
-	this.isTarget = isTarget;
-	width = imp.getWidth();
-	height = imp.getHeight();
-	int k = 0;
-	turboRegProgressBar.addWorkload(height);
-	if (imp.getType() == ImagePlus.GRAY8) {
-		image = new float[width * height];
-		final byte[] pixels = (byte[])imp.getProcessor().getPixels();
-		for (int y = 0; (y < height); y++) {
-			for (int x = 0; (x < width); x++, k++) {
-				image[k] = (float)(pixels[k] & 0xFF);
-			}
-			turboRegProgressBar.stepProgressBar();
-		}
-	}
-	else if (imp.getType() == ImagePlus.GRAY16) {
-		image = new float[width * height];
-		final short[] pixels = (short[])imp.getProcessor().getPixels();
-		for (int y = 0; (y < height); y++) {
-			for (int x = 0; (x < width); x++, k++) {
-				if (pixels[k] < (short)0) {
-					image[k] = (float)pixels[k] + 65536.0F;
-				}
-				else {
-					image[k] = (float)pixels[k];
-				}
-			}
-			turboRegProgressBar.stepProgressBar();
-		}
-	}
-	else if (imp.getType() == ImagePlus.GRAY32) {
-		image = (float[])imp.getProcessor().getPixels();
-	}
-	turboRegProgressBar.workloadDone(height);
-} /* end turboRegImage */
-
 /*....................................................................
-	Private methods
+	private methods
 ....................................................................*/
-
 /*------------------------------------------------------------------*/
 private void antiSymmetricFirMirrorOffBounds1D (
 	final double[] h,
@@ -4155,10 +4184,10 @@ class turboRegMask
 	implements
 		Runnable
 
-{ /* begin class turboRegMask */
+{ /* class turboRegMask */
 
 /*....................................................................
-	Private variables
+	private variables
 ....................................................................*/
 private final Stack<float[]> pyramid = new Stack<float[]>();
 private Thread t;
@@ -4168,9 +4197,67 @@ private int height;
 private int pyramidDepth;
 
 /*....................................................................
-	Public methods
+	Runnable methods
 ....................................................................*/
+/*********************************************************************
+ Start the mask precomputations, which are interruptible.
+ ********************************************************************/
+public void run (
+) {
+	buildPyramid();
+} /* end run */
 
+/*....................................................................
+	constructors
+....................................................................*/
+/*********************************************************************
+ Converts the pixel array of the incoming <code>ImagePlus</code>
+ object into a local <code>boolean</code> array.
+ @param imp <code>ImagePlus</code> object to preprocess.
+ ********************************************************************/
+public turboRegMask (
+	final ImagePlus imp
+) {
+	t = new Thread(this);
+	t.setDaemon(true);
+	width = imp.getWidth();
+	height = imp.getHeight();
+	int k = 0;
+	turboRegProgressBar.addWorkload(height);
+	mask = new float[width * height];
+	if (imp.getType() == ImagePlus.GRAY8) {
+		final byte[] pixels = (byte[])imp.getProcessor().getPixels();
+		for (int y = 0; (y < height); y++) {
+			for (int x = 0; (x < width); x++, k++) {
+				mask[k] = (float)pixels[k];
+			}
+			turboRegProgressBar.stepProgressBar();
+		}
+	}
+	else if (imp.getType() == ImagePlus.GRAY16) {
+		final short[] pixels = (short[])imp.getProcessor().getPixels();
+		for (int y = 0; (y < height); y++) {
+			for (int x = 0; (x < width); x++, k++) {
+				mask[k] = (float)pixels[k];
+			}
+			turboRegProgressBar.stepProgressBar();
+		}
+	}
+	else if (imp.getType() == ImagePlus.GRAY32) {
+		final float[] pixels = (float[])imp.getProcessor().getPixels();
+		for (int y = 0; (y < height); y++) {
+			for (int x = 0; (x < width); x++, k++) {
+				mask[k] = pixels[k];
+			}
+			turboRegProgressBar.stepProgressBar();
+		}
+	}
+	turboRegProgressBar.workloadDone(height);
+} /* end turboRegMask */
+
+/*....................................................................
+	public methods
+....................................................................*/
 /*********************************************************************
  Set to <code>true</code> every pixel of the full-size mask.
  ********************************************************************/
@@ -4227,14 +4314,6 @@ public Thread getThread (
 } /* end getThread */
 
 /*********************************************************************
- Start the mask precomputations, which are interruptible.
- ********************************************************************/
-public void run (
-) {
-	buildPyramid();
-} /* end run */
-
-/*********************************************************************
  Set the depth up to which the pyramids should be computed.
  @see turboRegMask#getPyramid()
  ********************************************************************/
@@ -4244,55 +4323,9 @@ public void setPyramidDepth (
 	this.pyramidDepth = pyramidDepth;
 } /* end setPyramidDepth */
 
-/*********************************************************************
- Converts the pixel array of the incoming <code>ImagePlus</code>
- object into a local <code>boolean</code> array.
- @param imp <code>ImagePlus</code> object to preprocess.
- ********************************************************************/
-public turboRegMask (
-	final ImagePlus imp
-) {
-	t = new Thread(this);
-	t.setDaemon(true);
-	width = imp.getWidth();
-	height = imp.getHeight();
-	int k = 0;
-	turboRegProgressBar.addWorkload(height);
-	mask = new float[width * height];
-	if (imp.getType() == ImagePlus.GRAY8) {
-		final byte[] pixels = (byte[])imp.getProcessor().getPixels();
-		for (int y = 0; (y < height); y++) {
-			for (int x = 0; (x < width); x++, k++) {
-				mask[k] = (float)pixels[k];
-			}
-			turboRegProgressBar.stepProgressBar();
-		}
-	}
-	else if (imp.getType() == ImagePlus.GRAY16) {
-		final short[] pixels = (short[])imp.getProcessor().getPixels();
-		for (int y = 0; (y < height); y++) {
-			for (int x = 0; (x < width); x++, k++) {
-				mask[k] = (float)pixels[k];
-			}
-			turboRegProgressBar.stepProgressBar();
-		}
-	}
-	else if (imp.getType() == ImagePlus.GRAY32) {
-		final float[] pixels = (float[])imp.getProcessor().getPixels();
-		for (int y = 0; (y < height); y++) {
-			for (int x = 0; (x < width); x++, k++) {
-				mask[k] = pixels[k];
-			}
-			turboRegProgressBar.stepProgressBar();
-		}
-	}
-	turboRegProgressBar.workloadDone(height);
-} /* end turboRegMask */
-
 /*....................................................................
-	Private methods
+	private methods
 ....................................................................*/
-
 /*------------------------------------------------------------------*/
 private void buildPyramid (
 ) {
@@ -4405,28 +4438,27 @@ class turboRegPointAction
 	extends
 		ImageCanvas
 	implements
-		FocusListener,
 		AdjustmentListener,
+		FocusListener,
 		KeyListener,
 		MouseListener,
 		MouseMotionListener
 
-{ /* begin class turboRegPointAction */
+{ /* class turboRegPointAction */
 
 /*....................................................................
-	Private variables
+	private variables
 ....................................................................*/
-
 private ImagePlus mainImp;
 private ImagePlus secondaryImp;
 private turboRegPointHandler mainPh;
 private turboRegPointHandler secondaryPh;
 private turboRegPointToolbar tb;
+private static final long serialVersionUID = 1L;
 
 /*....................................................................
-	Public methods
+	AdjustmentListener methods
 ....................................................................*/
-
 /*********************************************************************
  Listen to <code>AdjustmentEvent</code> events.
  @param e Ignored.
@@ -4437,6 +4469,9 @@ public synchronized void adjustmentValueChanged (
 	updateAndDraw();
 } /* adjustmentValueChanged */
 
+/*....................................................................
+	FocusListener methods
+....................................................................*/
 /*********************************************************************
  Listen to <code>focusGained</code> events.
  @param e Ignored.
@@ -4457,6 +4492,9 @@ public void focusLost (
 	updateAndDraw();
 } /* end focusLost */
 
+/*....................................................................
+	KeyListener methods
+....................................................................*/
 /*********************************************************************
  Listen to <code>keyPressed</code> events.
  @param e The expected key codes are as follows:
@@ -4549,6 +4587,9 @@ public void keyTyped (
 ) {
 } /* end keyTyped */
 
+/*....................................................................
+	MouseListener methods
+....................................................................*/
 /*********************************************************************
  Listen to <code>mouseClicked</code> events.
  @param e Ignored.
@@ -4557,25 +4598,6 @@ public void mouseClicked (
 	final MouseEvent e
 ) {
 } /* end mouseClicked */
-
-/*********************************************************************
- Listen to <code>mouseDragged</code> events. Move the position of
- the current point. Update the window's ROI. Update ImageJ's window.
- @param e Event.
- @see turboRegPointHandler#movePoint(int, int)
- @see turboRegPointAction#mouseMoved(java.awt.event.MouseEvent)
- ********************************************************************/
-public void mouseDragged (
-	final MouseEvent e
-) {
-	final int x = e.getX();
-	final int y = e.getY();
-	if (tb.getCurrentTool() == turboRegPointHandler.MOVE_CROSS) {
-		mainPh.movePoint(x, y);
-		updateAndDraw();
-	}
-	mouseMoved(e);
-} /* end mouseDragged */
 
 /*********************************************************************
  Listen to <code>mouseEntered</code> events. Change the cursor to a
@@ -4602,21 +4624,6 @@ public void mouseExited (
 	mainImp.getWindow().getCanvas().setCursor(defaultCursor);
 	IJ.showStatus("");
 } /* end mouseExited */
-
-/*********************************************************************
- Listen to <code>mouseMoved</code> events. Update the ImageJ status
- by displaying the value of the pixel under the cursor hot spot.
- @param e Event.
- ********************************************************************/
-public void mouseMoved (
-	final MouseEvent e
-) {
-	int x = e.getX();
-	int y = e.getY();
-	x = mainImp.getWindow().getCanvas().offScreenX(x);
-	y = mainImp.getWindow().getCanvas().offScreenY(y);
-	IJ.showStatus(mainImp.getLocationAsString(x, y) + getValueAsString(x, y));
-} /* end mouseMoved */
 
 /*********************************************************************
  Listen to <code>mousePressed</code> events. Update the current point
@@ -4658,20 +4665,46 @@ public void mouseReleased (
 ) {
 } /* end mouseReleased */
 
+/*....................................................................
+	MouseMotionListener methods
+....................................................................*/
 /*********************************************************************
- Set a reference to the <code>ImagePlus</code> and
- <code>turboRegPointHandler</code> objects of the other image.
- @param secondaryImp <code>ImagePlus</code> object.
- @param secondaryPh <code>turboRegPointHandler</code> object.
+ Listen to <code>mouseDragged</code> events. Move the position of
+ the current point. Update the window's ROI. Update ImageJ's window.
+ @param e Event.
+ @see turboRegPointHandler#movePoint(int, int)
+ @see turboRegPointAction#mouseMoved(java.awt.event.MouseEvent)
  ********************************************************************/
-public void setSecondaryPointHandler (
-	final ImagePlus secondaryImp,
-	final turboRegPointHandler secondaryPh
+public void mouseDragged (
+	final MouseEvent e
 ) {
-	this.secondaryImp = secondaryImp;
-	this.secondaryPh = secondaryPh;
-} /* end setSecondaryPointHandler */
+	final int x = e.getX();
+	final int y = e.getY();
+	if (tb.getCurrentTool() == turboRegPointHandler.MOVE_CROSS) {
+		mainPh.movePoint(x, y);
+		updateAndDraw();
+	}
+	mouseMoved(e);
+} /* end mouseDragged */
 
+/*********************************************************************
+ Listen to <code>mouseMoved</code> events. Update the ImageJ status
+ by displaying the value of the pixel under the cursor hot spot.
+ @param e Event.
+ ********************************************************************/
+public void mouseMoved (
+	final MouseEvent e
+) {
+	int x = e.getX();
+	int y = e.getY();
+	x = mainImp.getWindow().getCanvas().offScreenX(x);
+	y = mainImp.getWindow().getCanvas().offScreenY(y);
+	IJ.showStatus(mainImp.getLocationAsString(x, y) + getValueAsString(x, y));
+} /* end mouseMoved */
+
+/*....................................................................
+	constructors
+....................................................................*/
 /*********************************************************************
  Keep a local copy of the <code>turboRegPointHandler</code> and
  <code>turboRegPointToolbar</code> objects.
@@ -4691,9 +4724,25 @@ public turboRegPointAction (
 } /* end turboRegPointAction */
 
 /*....................................................................
-	Private methods
+	public methods
 ....................................................................*/
+/*********************************************************************
+ Set a reference to the <code>ImagePlus</code> and
+ <code>turboRegPointHandler</code> objects of the other image.
+ @param secondaryImp <code>ImagePlus</code> object.
+ @param secondaryPh <code>turboRegPointHandler</code> object.
+ ********************************************************************/
+public void setSecondaryPointHandler (
+	final ImagePlus secondaryImp,
+	final turboRegPointHandler secondaryPh
+) {
+	this.secondaryImp = secondaryImp;
+	this.secondaryPh = secondaryPh;
+} /* end setSecondaryPointHandler */
 
+/*....................................................................
+	private methods
+....................................................................*/
 /*------------------------------------------------------------------*/
 private String getValueAsString (
 	final int x,
@@ -4760,14 +4809,13 @@ private void updateStatus (
  ********************************************************************/
 class turboRegPointHandler
 	extends
-		Roi
+		PolygonRoi
 
-{ /* begin class turboRegPointHandler */
+{ /* class turboRegPointHandler */
 
 /*....................................................................
-	Public variables
+	public variables
 ....................................................................*/
-
 /*********************************************************************
  The magnifying tool is set in eleventh position to be coherent with
  ImageJ.
@@ -4788,8 +4836,12 @@ public static final int MOVE_CROSS = 1;
 public static final int NUM_POINTS = 4;
 
 /*....................................................................
-	Private variables
+	private variables
 ....................................................................*/
+/*********************************************************************
+ Serialization version number.
+ ********************************************************************/
+private static final long serialVersionUID = 1L;
 
 /*********************************************************************
  The drawn landmarks fit in a 11x11 matrix.
@@ -4802,18 +4854,17 @@ private static final int CROSS_HALFSIZE = 5;
  ********************************************************************/
 private static final double GOLDEN_RATIO = 0.5 * (Math.sqrt(5.0) - 1.0);
 
-private final Point[] point = new Point[NUM_POINTS];
-private final Color[] spectrum = new Color[NUM_POINTS];
-private double[][] precisionPoint = new double[NUM_POINTS][2];
-private int transformation;
-private int currentPoint = 0;
 private boolean interactive = true;
 private boolean started = false;
+private double[][] precisionPoint = new double[NUM_POINTS][2];
+private final Point[] point = new Point[NUM_POINTS];
+private final Color[] spectrum = new Color[NUM_POINTS];
+private int transformation;
+private int currentPoint = 0;
 
 /*....................................................................
-	Public methods
+	PolygonRoi methods
 ....................................................................*/
-
 /*********************************************************************
  Draw the landmarks. Outline the current point if the window has focus.
  @param g Graphics environment.
@@ -5046,6 +5097,62 @@ public void draw (
 	}
 } /* end draw */
 
+/*....................................................................
+	constructors
+....................................................................*/
+/*********************************************************************
+ Keep a local copy of the points and of the transformation.
+ ********************************************************************/
+public turboRegPointHandler (
+	final double[][] precisionPoint,
+	final int transformation
+) {
+	super(new Polygon(), POLYGON);
+	this.transformation = transformation;
+	this.precisionPoint = precisionPoint;
+	interactive = false;
+} /* end turboRegPointHandler */
+
+/*********************************************************************
+ Keep a local copy of the <code>ImagePlus</code> object. Set the
+ landmarks to their initial position for the given transformation.
+ @param imp <code>ImagePlus</code> object.
+ @param transformation Transformation code.
+ @see turboRegDialog#restoreAll()
+ ********************************************************************/
+public turboRegPointHandler (
+	final ImagePlus imp,
+	final int transformation
+) {
+	super(0, 0, imp);
+	this.imp = imp;
+	this.transformation = transformation;
+	setTransformation(transformation);
+	imp.setRoi(this);
+	started = true;
+} /* end turboRegPointHandler */
+
+/*********************************************************************
+ Set the landmarks to their initial position for the given
+ transformation.
+ @param transformation Transformation code.
+ @see turboRegDialog#restoreAll()
+ ********************************************************************/
+public turboRegPointHandler (
+	final int transformation,
+	final ImagePlus imp
+) {
+	super(new Polygon(), POLYGON);
+	this.imp = imp;
+	this.transformation = transformation;
+	setTransformation(transformation);
+	imp.setRoi(this);
+	started = true;
+} /* end turboRegPointHandler */
+
+/*....................................................................
+	public methods
+....................................................................*/
 /*********************************************************************
  Set the current point as that which is closest to (x, y).
  @param x Horizontal coordinate in canvas units.
@@ -5288,41 +5395,9 @@ public void setTransformation (
 	imp.updateAndDraw();
 } /* end setTransformation */
 
-/*********************************************************************
- Keep a local copy of the points and of the transformation.
- ********************************************************************/
-public turboRegPointHandler (
-	final double[][] precisionPoint,
-	final int transformation
-) {
-	super(0, 0, 0, 0, null);
-	this.transformation = transformation;
-	this.precisionPoint = precisionPoint;
-	interactive = false;
-} /* end turboRegPointHandler */
-
-/*********************************************************************
- Keep a local copy of the <code>ImagePlus</code> object. Set the
- landmarks to their initial position for the given transformation.
- @param imp <code>ImagePlus</code> object.
- @param transformation Transformation code.
- @see turboRegDialog#restoreAll()
- ********************************************************************/
-public turboRegPointHandler (
-	final ImagePlus imp,
-	final int transformation
-) {
-	super(0, 0, imp.getWidth(), imp.getHeight(), imp);
-	this.transformation = transformation;
-	setTransformation(transformation);
-	imp.setRoi(this);
-	started = true;
-} /* end turboRegPointHandler */
-
 /*....................................................................
-	Private methods
+	private methods
 ....................................................................*/
-
 /*------------------------------------------------------------------*/
 private void drawArcs (
 	final Graphics g
@@ -5442,11 +5517,15 @@ class turboRegPointToolbar
 	implements
 		MouseListener
 
-{ /* begin class turboRegPointToolbar */
+{ /* class turboRegPointToolbar */
 
 /*....................................................................
-	Private variables
+	private variables
 ....................................................................*/
+/*********************************************************************
+ Serialization version number.
+ ********************************************************************/
+private static final long serialVersionUID = 1L;
 
 /*********************************************************************
  Same number of tools than in ImageJ version 1.22
@@ -5478,17 +5557,21 @@ private int xOffset;
 private int yOffset;
 
 /*....................................................................
-	Public methods
+	Canvas methods
 ....................................................................*/
-
 /*********************************************************************
- Return the current tool index.
+ Draw the toolbar tools.
+ @param g Graphics environment.
  ********************************************************************/
-public int getCurrentTool (
+public void paint (
+	final Graphics g
 ) {
-	return(currentTool);
-} /* getCurrentTool */
+	drawButtons(g);
+} /* paint */
 
+/*....................................................................
+	MouseListener methods
+....................................................................*/
 /*********************************************************************
  Listen to <code>mouseClicked</code> events.
  @param e Ignored.
@@ -5524,7 +5607,6 @@ public void mousePressed (
 	final MouseEvent e
 ) {
 	final int x = e.getX();
-	final int y = e.getY();
 	int newTool = 0;
 	for (int i = 0; (i < NUM_TOOLS); i++) {
 		if (((i * SIZE) < x) && (x < (i * SIZE + SIZE))) {
@@ -5543,15 +5625,47 @@ public void mouseReleased (
 ) {
 } /* end mouseReleased */
 
+/*....................................................................
+	constructors
+....................................................................*/
 /*********************************************************************
- Draw the toolbar tools.
- @param g Graphics environment.
+ Override the ImageJ toolbar by this <code>turboRegToolbar</code>
+ object. Store a local copy of the ImageJ's toolbar for later restore.
+ @see turboRegPointToolbar#restorePreviousToolbar()
  ********************************************************************/
-public void paint (
-	final Graphics g
+public turboRegPointToolbar (
+	final Toolbar previousToolbar
 ) {
-	drawButtons(g);
-} /* paint */
+	previousInstance = previousToolbar;
+	instance = this;
+	final Container container = previousToolbar.getParent();
+	final Component[] component = container.getComponents();
+	for (int i = 0; (i < component.length); i++) {
+		if (component[i] == previousToolbar) {
+			container.remove(previousToolbar);
+			container.add(this, i);
+			break;
+		}
+	}
+	resetButtons();
+	down[currentTool] = true;
+	setTool(currentTool);
+	setForeground(Color.black);
+	setBackground(gray);
+	addMouseListener(this);
+	container.validate();
+} /* end turboRegPointToolbar */
+
+/*....................................................................
+	public methods
+....................................................................*/
+/*********************************************************************
+ Return the current tool index.
+ ********************************************************************/
+public int getCurrentTool (
+) {
+	return(currentTool);
+} /* getCurrentTool */
 
 /*********************************************************************
  Restore the ImageJ toolbar.
@@ -5590,38 +5704,9 @@ public void setTool (
 	currentTool = tool;
 } /* end setTool */
 
-/*********************************************************************
- Override the ImageJ toolbar by this <code>turboRegToolbar</code>
- object. Store a local copy of the ImageJ's toolbar for later restore.
- @see turboRegPointToolbar#restorePreviousToolbar()
- ********************************************************************/
-public turboRegPointToolbar (
-	final Toolbar previousToolbar
-) {
-	previousInstance = previousToolbar;
-	instance = this;
-	final Container container = previousToolbar.getParent();
-	final Component[] component = container.getComponents();
-	for (int i = 0; (i < component.length); i++) {
-		if (component[i] == previousToolbar) {
-			container.remove(previousToolbar);
-			container.add(this, i);
-			break;
-		}
-	}
-	resetButtons();
-	down[currentTool] = true;
-	setTool(currentTool);
-	setForeground(Color.black);
-	setBackground(gray);
-	addMouseListener(this);
-	container.validate();
-} /* end turboRegPointToolbar */
-
 /*....................................................................
-	Private methods
+	private methods
 ....................................................................*/
-
 /*------------------------------------------------------------------*/
 private void d (
 	int x,
@@ -5798,12 +5883,11 @@ private void showMessage (
  ********************************************************************/
 class turboRegProgressBar
 
-{ /* begin class turboRegProgressBar */
+{ /* class turboRegProgressBar */
 
 /*....................................................................
-	Private variables
+	private variables
 ....................................................................*/
-
 /*********************************************************************
  Same time constant than in ImageJ version 1.22
  ********************************************************************/
@@ -5814,9 +5898,8 @@ private static volatile int completed = 0;
 private static volatile int workload = 0;
 
 /*....................................................................
-	Public methods
+	public methods
 ....................................................................*/
-
 /*********************************************************************
  Extend the amount of work to perform by <code>batch</code>.
  @param batch Additional amount of work that need be performed.
@@ -5894,12 +5977,11 @@ public static synchronized void workloadDone (
  ********************************************************************/
 class turboRegTransform
 
-{ /* begin class turboRegTransform */
+{ /* class turboRegTransform */
 
 /*....................................................................
-	Private variables
+	private variables
 ....................................................................*/
-
 /*********************************************************************
  Maximal number of registration iterations per level, when
  speed is requested at the expense of accuracy. This number must be
@@ -5948,31 +6030,8 @@ private static final double PIXEL_LOW_PRECISION = 0.1;
  ********************************************************************/
 private static final int ITERATION_PROGRESSION = 2;
 
-private final double[] dxWeight = new double[4];
-private final double[] dyWeight = new double[4];
-private final double[] xWeight = new double[4];
-private final double[] yWeight = new double[4];
-private final int[] xIndex = new int[4];
-private final int[] yIndex = new int[4];
-private turboRegImage sourceImg;
-private turboRegImage targetImg;
-private turboRegMask sourceMsk;
-private turboRegMask targetMsk;
-private turboRegPointHandler sourcePh;
-private turboRegPointHandler targetPh;
-private double[][] sourcePoint;
-private double[][] targetPoint;
-private float[] inImg;
-private float[] outImg;
-private float[] xGradient;
-private float[] yGradient;
-private float[] inMsk;
-private float[] outMsk;
-private double targetJacobian;
-private double s;
-private double t;
-private double x;
-private double y;
+private boolean accelerated;
+private boolean interactive;
 private double c0;
 private double c0u;
 private double c0v;
@@ -5990,26 +6049,94 @@ private double c3u;
 private double c3v;
 private double c3uv;
 private double pixelPrecision;
-private int maxIterations;
-private int p;
-private int q;
+private double s;
+private double t;
+private double targetJacobian;
+private double x;
+private double y;
+private double[][] sourcePoint;
+private double[][] targetPoint;
+private final double[] dxWeight = new double[4];
+private final double[] dyWeight = new double[4];
+private final double[] xWeight = new double[4];
+private final double[] yWeight = new double[4];
+private final int[] xIndex = new int[4];
+private final int[] yIndex = new int[4];
+private float[] inImg;
+private float[] inMsk;
+private float[] outImg;
+private float[] outMsk;
+private float[] xGradient;
+private float[] yGradient;
 private int inNx;
 private int inNy;
+private int iterationCost;
+private int iterationPower;
+private int maxIterations;
 private int outNx;
 private int outNy;
+private int p;
+private int pyramidDepth;
+private int q;
+private int transformation;
 private int twiceInNx;
 private int twiceInNy;
-private int transformation;
-private int pyramidDepth;
-private int iterationPower;
-private int iterationCost;
-private boolean accelerated;
-private boolean interactive;
+private turboRegImage sourceImg;
+private turboRegImage targetImg;
+private turboRegMask sourceMsk;
+private turboRegMask targetMsk;
+private turboRegPointHandler sourcePh;
 
 /*....................................................................
-	Public methods
+	constructors
 ....................................................................*/
+/*********************************************************************
+ Keep a local copy of most everything. Select among the pre-stored
+ constants.
+ @param targetImg Target image pyramid.
+ @param targetMsk Target mask pyramid.
+ @param sourceImg Source image pyramid.
+ @param sourceMsk Source mask pyramid.
+ @param targetPh Target <code>turboRegPointHandler</code> object.
+ @param sourcePh Source <code>turboRegPointHandler</code> object.
+ @param transformation Transformation code.
+ @param accelerated Trade-off between speed and accuracy.
+ @param interactive Shows or hides the resulting image.
+ ********************************************************************/
+public turboRegTransform (
+	final turboRegImage sourceImg,
+	final turboRegMask sourceMsk,
+	final turboRegPointHandler sourcePh,
+	final turboRegImage targetImg,
+	final turboRegMask targetMsk,
+	final turboRegPointHandler targetPh,
+	final int transformation,
+	final boolean accelerated,
+	final boolean interactive
+) {
+	this.sourceImg = sourceImg;
+	this.sourceMsk = sourceMsk;
+	this.sourcePh = sourcePh;
+	this.targetImg = targetImg;
+	this.targetMsk = targetMsk;
+	this.transformation = transformation;
+	this.accelerated = accelerated;
+	this.interactive = interactive;
+	sourcePoint = sourcePh.getPoints();
+	targetPoint = targetPh.getPoints();
+	if (accelerated) {
+		pixelPrecision = PIXEL_LOW_PRECISION;
+		maxIterations = FEW_ITERATIONS;
+	}
+	else {
+		pixelPrecision = PIXEL_HIGH_PRECISION;
+		maxIterations = MANY_ITERATIONS;
+	}
+} /* end turboRegTransform */
 
+/*....................................................................
+	public methods
+....................................................................*/
 /*********************************************************************
  Append the current landmarks into a text file. Rigid format.
  @param pathAndFilename Path and name of the file where batch results
@@ -6199,7 +6326,6 @@ public float[] doFinalTransform (
 	this.sourceImg = sourceImg;
 	this.targetImg = targetImg;
 	this.sourcePh = sourcePh;
-	this.targetPh = targetPh;
 	this.transformation = transformation;
 	this.accelerated = accelerated;
 	sourcePoint = sourcePh.getPoints();
@@ -6242,15 +6368,15 @@ public float[] doFinalTransform (
  ********************************************************************/
 public void doRegistration (
 ) {
-	Stack sourceImgPyramid;
-	Stack sourceMskPyramid;
-	Stack targetImgPyramid;
-	Stack targetMskPyramid;
+	Stack<?> sourceImgPyramid;
+	Stack<?> sourceMskPyramid;
+	Stack<?> targetImgPyramid;
+	Stack<?> targetMskPyramid;
 	if (sourceMsk == null) {
 		sourceImgPyramid = sourceImg.getPyramid();
 		sourceMskPyramid = null;
-		targetImgPyramid = (Stack)targetImg.getPyramid().clone();
-		targetMskPyramid = (Stack)targetMsk.getPyramid().clone();
+		targetImgPyramid = (Stack<?>)targetImg.getPyramid().clone();
+		targetMskPyramid = (Stack<?>)targetMsk.getPyramid().clone();
 	}
 	else {
 		sourceImgPyramid = sourceImg.getPyramid();
@@ -6336,7 +6462,7 @@ public void doRegistration (
 				break;
 			}
 			case turboRegDialog.BILINEAR: {
-				MarquardtLevenbergOptimization(
+				marquardtLevenbergOptimization(
 					iterationPower * maxIterations - 1);
 				break;
 			}
@@ -6398,7 +6524,7 @@ public void doRegistration (
 				break;
 			}
 			case turboRegDialog.BILINEAR: {
-				MarquardtLevenbergOptimization(maxIterations - 1);
+				marquardtLevenbergOptimization(maxIterations - 1);
 				break;
 			}
 		}
@@ -6426,8 +6552,8 @@ public String saveTransformation (
 	String path = "";
 	if (filename == null) {
 		final Frame f = new Frame();
-		final FileDialog fd = new FileDialog(
-			f, "Save landmarks", FileDialog.SAVE);
+		final FileDialog fd = new FileDialog(f, "Save landmarks",
+			FileDialog.SAVE);
 		filename = "landmarks.txt";
 		fd.setFile(filename);
 		fd.setVisible(true);
@@ -6503,55 +6629,9 @@ public String saveTransformation (
 	return(path + filename);
 } /* end saveTransformation */
 
-/*********************************************************************
- Keep a local copy of most everything. Select among the pre-stored
- constants.
- @param targetImg Target image pyramid.
- @param targetMsk Target mask pyramid.
- @param sourceImg Source image pyramid.
- @param sourceMsk Source mask pyramid.
- @param targetPh Target <code>turboRegPointHandler</code> object.
- @param sourcePh Source <code>turboRegPointHandler</code> object.
- @param transformation Transformation code.
- @param accelerated Trade-off between speed and accuracy.
- @param interactive Shows or hides the resulting image.
- ********************************************************************/
-public turboRegTransform (
-	final turboRegImage sourceImg,
-	final turboRegMask sourceMsk,
-	final turboRegPointHandler sourcePh,
-	final turboRegImage targetImg,
-	final turboRegMask targetMsk,
-	final turboRegPointHandler targetPh,
-	final int transformation,
-	final boolean accelerated,
-	final boolean interactive
-) {
-	this.sourceImg = sourceImg;
-	this.sourceMsk = sourceMsk;
-	this.sourcePh = sourcePh;
-	this.targetImg = targetImg;
-	this.targetMsk = targetMsk;
-	this.targetPh = targetPh;
-	this.transformation = transformation;
-	this.accelerated = accelerated;
-	this.interactive = interactive;
-	sourcePoint = sourcePh.getPoints();
-	targetPoint = targetPh.getPoints();
-	if (accelerated) {
-		pixelPrecision = PIXEL_LOW_PRECISION;
-		maxIterations = FEW_ITERATIONS;
-	}
-	else {
-		pixelPrecision = PIXEL_HIGH_PRECISION;
-		maxIterations = MANY_ITERATIONS;
-	}
-} /* end turboRegTransform */
-
 /*....................................................................
-	Private methods
+	private methods
 ....................................................................*/
-
 /*------------------------------------------------------------------*/
 private void affineTransform (
 	final double[][] matrix
@@ -6781,12 +6861,6 @@ private void computeBilinearGradientConstants (
 	final double v2 = targetPoint[1][1];
 	final double v3 = targetPoint[2][1];
 	final double v4 = targetPoint[3][1];
-	final double u12 = u1 - u2;
-	final double u13 = u1 - u3;
-	final double u14 = u1 - u4;
-	final double u23 = u2 - u3;
-	final double u24 = u2 - u4;
-	final double u34 = u3 - u4;
 	final double v12 = v1 - v2;
 	final double v13 = v1 - v3;
 	final double v14 = v1 - v4;
@@ -9042,7 +9116,7 @@ private void invertGauss (
 } /* end invertGauss */
 
 /*------------------------------------------------------------------*/
-private void MarquardtLevenbergOptimization (
+private void marquardtLevenbergOptimization (
 	int workload
 ) {
 	final double[][] attempt = new double[transformation / 2][2];
@@ -9106,7 +9180,7 @@ private void MarquardtLevenbergOptimization (
 		}
 	}
 	turboRegProgressBar.skipProgressBar(workload * iterationCost);
-} /* end MarquardtLevenbergOptimization */
+} /* end marquardtLevenbergOptimization */
 
 /*------------------------------------------------------------------*/
 private double[] matrixMultiply (
