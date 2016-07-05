@@ -855,6 +855,8 @@ public double[][] getTargetPoints (
  <code>outputWidth</code> and <code>outputHeight</code> parameters of
  the call to the <code>run</code> method of <code>TurboReg_</code>.
  @see TurboReg_#run
+ The return javadoc line added by Chris Wood July 5, 2016
+ @return ImagePlus of the transformed image
  ********************************************************************/
 public ImagePlus getTransformedImage (
 ) {
