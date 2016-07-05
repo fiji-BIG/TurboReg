@@ -810,6 +810,8 @@ public void run (
  (3), and bilinear transformation (4).
  @see TurboReg_#run
  @see TurboReg_#getTargetPoints
+ The return javadoc line added by Chris Wood July 5, 2016
+ @return Source points double[][] array
  ********************************************************************/
 public double[][] getSourcePoints (
 ) {
