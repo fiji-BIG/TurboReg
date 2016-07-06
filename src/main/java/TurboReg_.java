@@ -3,6 +3,22 @@
 \===================================================================*/
 
 /*====================================================================
+| July 5, 2106
+|
+| This code is a branch of the source code maintained by Philippe Thevenaz
+| at http://bigwww.epfl.ch/thevenaz/turboreg/
+|
+| Modified July 5, 2016 to not use the main ImageJ table or reset the
+| main ImageJ table
+|
+| Chris Wood
+| Stowers Institue for Medical Research
+| 1000 E 50th Kansas City
+| Kansas City, MO 64060
+| USA
+| cjw@stowers.org
+\====================================================================*/
+/*====================================================================
 | Philippe Thevenaz
 | EPFL/STI/IMT/LIB/BM.4.137
 | Station 17
