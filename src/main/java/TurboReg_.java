@@ -1000,8 +1000,16 @@ private ImagePlus alignImages (
 	}
 	sourcePoints = sourcePh.getPoints();
 	targetPoints = targetPh.getPoints();
-	final ResultsTable table = Analyzer.getResultsTable();
-	table.reset();
+
+	//The following change of the ResultsTable made by
+	// Chris Wood July, 5 2016
+	//final ResultsTable table = Analyzer.getResultsTable();
+	//Create a new table rather than using the main results table so macros can use the results table without
+	// being cleared
+	final ResultsTable table = new ResultsTable();
+//	 do not need to reset a new table  -  Chris Wood July 5, 2016
+//	table.reset;
+
 	switch (transformation) {
 		case turboRegDialog.TRANSLATION: {
 			table.incrementCounter();
@@ -1060,8 +1068,17 @@ private ImagePlus alignImages (
 		}
 	}
 	if (interactive) {
+<<<<<<< HEAD
 		table.show("Results");
 	}
+=======
+		table.show("TurboReg Results"); // table name changed by Chris Wood, July 5, 2016
+	}
+
+	//the follow table reset by Chris Wood July 5, 2016
+	//reset the table so the headings on the new tables aren't modified
+	table.reset();
+>>>>>>> table
 	source.killRoi();
 	target.killRoi();
 	return(transformImage(source, target.getWidth(), target.getHeight(),
