@@ -1068,17 +1068,12 @@ private ImagePlus alignImages (
 		}
 	}
 	if (interactive) {
-<<<<<<< HEAD
-		table.show("Results");
-	}
-=======
 		table.show("TurboReg Results"); // table name changed by Chris Wood, July 5, 2016
 	}
 
 	//the follow table reset by Chris Wood July 5, 2016
 	//reset the table so the headings on the new tables aren't modified
 	table.reset();
->>>>>>> table
 	source.killRoi();
 	target.killRoi();
 	return(transformImage(source, target.getWidth(), target.getHeight(),
