@@ -1136,7 +1136,8 @@ private ImagePlus alignImages (
 		}
 	}
 	if (interactive) {
-		table.show("Results");
+
+		table.show("TurboReg Results"); // table name changed by Chris Wood, July 5, 2016
 	}
 
 	//reset the table so the headings on new tables aren't modified
