@@ -79,6 +79,7 @@ import ij.plugin.PlugIn;
 import ij.plugin.filter.Analyzer;
 import ij.process.FloatProcessor;
 import ij.process.ImageConverter;
+import ij.process.ImageProcessor;
 import ij.process.StackConverter;
 
 // Java 1.1
@@ -878,6 +879,24 @@ public void run (
 		}
 	}
 } /* end run */
+
+/**
+ * Align two image planes with a given alignment method
+ * 
+ * @param ipSource source ImageProcessor
+ * @param ipTarget target ImageProcessor
+ * @param alignmentMethod alignment method (see {@code TurboReg_.turboRegDialog})
+ * 
+ * @return the aligned source image
+ */
+public ImageProcessor alignPlanes(ImageProcessor ipSource, ImageProcessor ipTarget, int alignmentMethod) {
+	ImagePlus impSource = new ImagePlus("Source", ipSource);
+	ImagePlus impTarget = new ImagePlus("Target", ipTarget);
+	int[] sourceCrop = new int[] {0, 0, ipSource.getWidth(), ipSource.getHeight()};
+	int[] targetCrop = new int[] {0, 0, ipTarget.getWidth(), ipTarget.getHeight()};
+	ImagePlus resultImp = alignImages(impSource, sourceCrop, impTarget, targetCrop, alignmentMethod, false);
+	return resultImp.getProcessor();
+}
 
 /*....................................................................
 	public methods
